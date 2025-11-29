@@ -11,7 +11,7 @@
     "lint": "expo lint",
     "build:web": "expo build:web --no-dev --public-url ./",
     "build": "npm run export:web",
-    "export:web": "expo export:web --output-dir web-build --public-url ./"
+    "export:web": "expo export --platform web"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
