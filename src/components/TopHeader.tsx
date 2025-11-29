@@ -1,0 +1,55 @@
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { COLORS } from '../theme';
+
+export default function TopHeader({ title }: { title: string }) {
+  const navigation: any = useNavigation();
+  const canGoBack = typeof navigation?.canGoBack === 'function' && navigation.canGoBack();
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.left}>
+        {canGoBack ? (
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} accessibilityLabel="Go back">
+            <Text style={styles.backArrow}>‹</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.leftPlaceholder} />
+        )}
+      </View>
+
+      <View style={styles.center}>
+        <Text numberOfLines={1} style={styles.text}>{title}</Text>
+      </View>
+
+      <View style={styles.right}>
+        <View style={styles.avatarPlaceholder} />
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eef2f6'
+  },
+  left: { width: 56, alignItems: 'flex-start', justifyContent: 'center' },
+  leftPlaceholder: { width: 36, height: 36 },
+
+  backBtn: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: 8 },
+  backArrow: { fontSize: 28, color: '#333', lineHeight: 28 },
+
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  text: { color: '#111', fontSize: 18, fontWeight: '800' },
+
+  right: { width: 56, alignItems: 'flex-end', justifyContent: 'center' },
+  avatarPlaceholder: { width: 36, height: 36, borderRadius: 999, backgroundColor: '#f0f2f5' }
+});

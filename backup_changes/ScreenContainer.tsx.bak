@@ -1,0 +1,22 @@
+import React from 'react';
+import { View, StyleSheet, Dimensions, Platform } from 'react-native';
+
+// Responsive container: centers content and caps width on wide screens
+export default function ScreenContainer({ children }: any) {
+  const { width } = Dimensions.get('window');
+  const isWide = width >= 900 || (Platform.OS === 'web' && width > 700);
+  return (
+    <View style={[styles.outer, { paddingHorizontal: isWide ? 24 : 12, paddingVertical: isWide ? 28 : 16 }]}>
+      <View style={{ width: '100%', maxWidth: isWide ? 1200 : '100%', alignSelf: 'center' }}>
+        {children}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  outer: {
+    flex: 1,
+    backgroundColor: '#F7F9FB'
+  }
+});

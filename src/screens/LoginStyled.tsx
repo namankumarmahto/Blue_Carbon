@@ -1,0 +1,134 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Platform,
+  Image,
+  KeyboardAvoidingView,
+  useWindowDimensions,
+  Alert
+} from 'react-native';
+import RolePicker from '../components/RolePicker';
+import ScreenContainer from '../components/ScreenContainer';
+import BCButton from '../components/BCButton';
+import { COLORS, SP, TYPO } from '../theme';
+
+export default function LoginStyled({ navigation }: any) {
+  const [email, setEmail] = useState('');
+  const [pwd, setPwd] = useState('');
+  const [role, setRole] = useState<any | null>(null);
+
+  const { width } = useWindowDimensions();
+  const isWeb = Platform.OS === 'web';
+  const cardWidth = isWeb ? Math.min(520, width * 0.55) : Math.min(360, width - 40);
+
+  const handleLogin = () => {
+    if (!role) {
+      Alert.alert('Select role', 'Please select a role before logging in.');
+      return;
+    }
+    // Use reset so previous screens (Splash/Login) are removed from history
+    if (role.key === 'field') {
+      navigation.reset({ index: 0, routes: [{ name: 'FieldUser' }] });
+      return;
+    }
+    if (role.key === 'buyer') {
+      navigation.reset({ index: 0, routes: [{ name: 'Buyer' }] });
+      return;
+    }
+    if (role.key === 'admin') {
+      navigation.reset({ index: 0, routes: [{ name: 'Admin' }] });
+      return;
+    }
+    navigation.reset({ index: 0, routes: [{ name: 'Dashboard' }] });
+  };
+
+  return (
+    <ScreenContainer>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ width: '100%' }}>
+        <View style={styles.headerCenter}>
+          <View style={styles.logoWrap}>
+            <Image source={require('../../assets/cloud.png')} style={styles.logo} />
+          </View>
+
+          <Text style={[styles.title, isWeb && { fontSize: 36 }]}>Blue Carbon Registry</Text>
+          <Text style={[styles.subtitle, isWeb && { fontSize: 16 }]}>Secure · Transparent · Collaborative</Text>
+        </View>
+
+        <View style={[styles.card, { width: cardWidth }]}>
+          <View style={styles.inputRow}>
+            <View style={styles.iconCell}><Text style={styles.iconEmoji}>👤</Text></View>
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Email / Username"
+              placeholderTextColor="#9AA4AE"
+              style={styles.inputField}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputRow}>
+            <View style={styles.iconCell}><Text style={styles.iconEmoji}>🔒</Text></View>
+            <TextInput
+              value={pwd}
+              onChangeText={setPwd}
+              placeholder="Password"
+              placeholderTextColor="#9AA4AE"
+              style={styles.inputField}
+              secureTextEntry
+            />
+          </View>
+
+          <View style={{ marginTop: 6 }}>
+            <RolePicker value={role} onSelect={(r) => setRole(r)} />
+          </View>
+
+          <View style={{ marginTop: 10 }}>
+            <Text style={{ color: '#6b7280' }}>Selected role:</Text>
+            <Text style={{ fontWeight: '700', marginTop: 6 }}>{role ? role.label : 'None'}</Text>
+          </View>
+
+          <BCButton title="Login" onPress={handleLogin} />
+
+          <View style={styles.bottomRow}>
+            <TouchableOpacity onPress={() => { /* Forgot password */ }}>
+              <Text style={styles.linkTxt}>Forgot Password?</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => { /* Sign up */ }}>
+              <Text style={styles.linkTxt}>Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </ScreenContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  headerCenter: { alignItems: 'center', marginBottom: SP.lg },
+  logoWrap: { width: 72, height: 72, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  logo: { width: 64, height: 64, resizeMode: 'contain', tintColor: COLORS.brand },
+
+  title: { fontSize: TYPO.h1, color: COLORS.brand, fontWeight: '800', textAlign: 'center' },
+  subtitle: { fontSize: TYPO.small, color: '#95A0AB', marginTop: 6, textAlign: 'center' },
+
+  card: { alignSelf: 'center', backgroundColor: COLORS.card, borderRadius: 18, padding: SP.md, shadowColor: '#0b1220', shadowOpacity: 0.06, shadowRadius: 12, elevation: 6, marginTop: SP.md },
+
+  inputRow: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, backgroundColor: '#F6F8FA', overflow: 'hidden', borderWidth: 1, borderColor: '#F0F2F5', marginBottom: 12 },
+  iconCell: { width: 54, height: 54, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff', borderRightWidth: 1, borderRightColor: '#f0f2f5' },
+  iconEmoji: { fontSize: 20 },
+
+  inputField: { flex: 1, paddingVertical: 14, paddingHorizontal: 12, fontSize: TYPO.body, color: COLORS.text, backgroundColor: '#F6F8FA' },
+
+  loginBtn: { marginTop: 8, backgroundColor: COLORS.brand, paddingVertical: 14, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  loginTxt: { color: '#fff', fontWeight: '700', fontSize: TYPO.body },
+
+  bottomRow: { marginTop: 10, flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 6 },
+  linkTxt: { color: COLORS.brand, fontWeight: '600' }
+});

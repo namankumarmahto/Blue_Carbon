@@ -1,0 +1,98 @@
+import 'react-native-gesture-handler';
+import React, { useRef } from 'react';
+import { Platform } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Linking from 'expo-linking';
+
+import SplashScreen from './screens/SplashScreen';
+import LoginStyled from './screens/LoginStyled';
+import Dashboard from './screens/Dashboard';
+import FieldUserTabs from './navigation/FieldUserTabs';
+import BuyerTabs from './navigation/BuyerTabs';
+import AdminHome from './screens/AdminHome';
+
+// prefix for expo/linking
+const prefix = Linking.createURL('/');
+
+const linking = {
+  prefixes: [prefix, 'https://yourdomain.com', 'https://www.yourdomain.com'],
+  config: {
+    initialRouteName: 'Splash',
+    screens: {
+      Splash: 'splash',
+      // root now goes to login
+      LoginStyled: '',
+      Dashboard: 'dashboard',
+      FieldUser: {
+        path: 'field',
+        screens: {
+          HomeTab: '',
+          ProjectsTab: 'projects',
+          PaymentsTab: 'payments',
+          ReportsTab: 'reports',
+          HelpTab: 'help'
+        }
+      },
+      Buyer: {
+        path: 'buyer',
+        screens: {
+          Marketplace: '',
+          Portfolio: 'portfolio',
+          Orders: 'orders',
+          Help: 'help'
+        }
+      },
+      Admin: 'admin'
+    }
+  }
+};
+
+const Stack = createNativeStackNavigator();
+
+export default function App() {
+  const navigationRef: any = useRef(null);
+
+  const routeToPath = (route: any) => {
+    if (!route) return '/';
+    const { name } = route;
+    if (name === 'Splash') return '/splash';
+    if (name === 'LoginStyled') return '/';
+    if (name === 'Dashboard') return '/dashboard';
+    if (name === 'FieldUser') return '/field';
+    if (name === 'Buyer') return '/buyer';
+    if (name === 'Admin') return '/admin';
+    return '/';
+  };
+
+  const onStateChange = () => {
+    try {
+      const nav = navigationRef.current;
+      if (!nav) return;
+      const route = nav.getCurrentRoute && nav.getCurrentRoute();
+      const path = routeToPath(route);
+      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.history) {
+        const current = window.location.pathname + window.location.search;
+        if (current !== path) {
+          window.history.replaceState({}, '', path);
+          document.title = route?.name ? `BlueCarbon — ${route.name}` : 'BlueCarbon';
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  return (
+    <NavigationContainer ref={navigationRef} linking={linking} onStateChange={onStateChange} fallback={<></>}>
+      <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="LoginStyled" component={LoginStyled} />
+        <Stack.Screen name="Dashboard" component={Dashboard} />
+        <Stack.Screen name="FieldUser" component={FieldUserTabs} />
+        <Stack.Screen name="Buyer" component={BuyerTabs} />
+        <Stack.Screen name="Admin" component={AdminHome} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}

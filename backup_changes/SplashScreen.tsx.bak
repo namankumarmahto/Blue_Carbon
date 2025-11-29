@@ -1,0 +1,23 @@
+import React, { useEffect } from 'react';
+import { Text, StyleSheet, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+
+export default function SplashScreen({ navigation }: any) {
+  useEffect(() => {
+    const t = setTimeout(() => navigation.replace('Welcome'), 1600);
+    return () => clearTimeout(t);
+  }, [navigation]);
+
+  return (
+    <LinearGradient colors={['#0E6767', '#06A9A2']} style={styles.container}>
+      <View style={styles.iconWrap}><Text style={styles.emoji}>☁️</Text></View>
+      <Text style={styles.title}>Welcome</Text>
+      <Text style={styles.subtitle}>BlueCarbon</Text>
+    </LinearGradient>
+  );
+}
+const styles = StyleSheet.create({
+  container: { flex:1, alignItems:'center', justifyContent:'center' },
+  iconWrap: { width:110, height:110, borderRadius:24, alignItems:'center', justifyContent:'center', marginBottom:24, backgroundColor:'rgba(255,255,255,0.08)' },
+  emoji: { fontSize:56 }, title:{ fontSize:36, fontWeight:'700', color:'#fff', marginBottom:6 }, subtitle:{ fontSize:18, color:'rgba(255,255,255,0.95)' }
+});

@@ -1,6 +1,6 @@
 {
   "name": "bluecarbon",
-  "main": "App.js",
+  "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
@@ -8,10 +8,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint",
-    "build:web": "expo build:web --no-dev --public-url ./",
-    "build": "npm run export:web",
-    "export:web": "expo export:web --output-dir web-build --public-url ./"
+    "lint": "expo lint"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -27,6 +24,7 @@
     "expo-image": "~3.0.10",
     "expo-linear-gradient": "~15.0.7",
     "expo-linking": "~8.0.9",
+    "expo-router": "~6.0.15",
     "expo-splash-screen": "~31.0.11",
     "expo-status-bar": "~3.0.8",
     "expo-symbols": "~1.0.7",
