@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import React, { useRef, useEffect } from 'react';
 import { Platform, BackHandler } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, CommonActions } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Linking from 'expo-linking';
 
@@ -12,7 +12,7 @@ import FieldUserTabs from './navigation/FieldUserTabs';
 import BuyerTabs from './navigation/BuyerTabs';
 import AdminHome from './screens/AdminHome';
 
-// linking config (web deep links)
+// linking config
 const prefix = Linking.createURL('/');
 const linking = {
   prefixes: [prefix],
@@ -34,21 +34,30 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   const navigationRef: any = useRef(null);
 
-  // Android hardware back handling
+  // Android hardware back: pop when possible; if not, navigate to Login or exit
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     const onBackPress = () => {
       const nav = navigationRef.current;
       if (!nav) return false;
       try {
+        // If can go back -> pop
         if (nav.canGoBack()) {
           nav.goBack();
-          return true; // handled
-        } else {
-          // no more screens to go back to -> exit app
+          return true;
+        }
+
+        // no stack to pop: decide fallback
+        const route = nav.getCurrentRoute && nav.getCurrentRoute();
+        // if we are on login or splash — exit app
+        if (!route || route.name === 'LoginStyled' || route.name === 'Splash') {
           BackHandler.exitApp();
           return true;
         }
+
+        // otherwise navigate to Login (or Dashboard) as a safe fallback
+        nav.dispatch(CommonActions.navigate({ name: 'LoginStyled' }));
+        return true;
       } catch (e) {
         return false;
       }
@@ -57,7 +66,7 @@ export default function App() {
     return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
   }, []);
 
-  // onStateChange: update document title / URL when needed (web)
+  // Web: keep URL in sync (fallback)
   const onStateChange = () => {
     try {
       if (Platform.OS === 'web' && typeof window !== 'undefined') {
@@ -71,9 +80,7 @@ export default function App() {
           if (route.name === 'Dashboard') return '/dashboard';
           return '/';
         })();
-        if (window.location.pathname !== path) {
-          window.history.replaceState({}, '', path);
-        }
+        if (window.location.pathname !== path) window.history.replaceState({}, '', path);
         document.title = route?.name ? `BlueCarbon — ${route.name}` : 'BlueCarbon';
       }
     } catch (e) {
